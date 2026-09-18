@@ -2,9 +2,14 @@ cff-version: 1.2.0
 message: "If you use this software, cite the associated publication, this software archive, and the external datasets and IDR implementation."
 title: "Climate_Losses_Damage"
 type: software
-version: "0.1.0"
+version: "1.0.0"
+date-released: "2026-09-18"
 repository-code: "https://github.com/SylvainRo/Climate_Losses_Damage"
 license: MIT
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.22830785"
+    description: "Zenodo archive of this software, v1.0.0"
 authors:
   - family-names: "Rossi"
     given-names: "Sylvain"

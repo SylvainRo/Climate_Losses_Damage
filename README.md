@@ -1,5 +1,7 @@
 # Climate Losses Damage
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22830785.svg)](https://doi.org/10.5281/zenodo.22830785)
+
 Climate Losses Damage is a research-code repository for studying how damage
 functions recover climate-related losses in the upper tail. It combines a
 synthetic hazard-loss simulation study based on bivariate extreme-value
@@ -184,15 +186,20 @@ tree:
 - the official IDR wheel must be installed separately;
 - full-scale sweep result CSVs/HDF5 caches/figures are generated locally and
   kept out of the repository via `.gitignore` (potentially large);
-- `CITATION.cff` has authors and a repository URL, but no publication DOI
-  yet — the associated paper is still a draft.
+- `CITATION.cff` has authors, a repository URL, and a Zenodo DOI for the
+  software itself; the associated paper's own DOI is still pending, since
+  it's not yet published.
 
 ## Citation and License
 
 The source data, external IDR implementation, and associated scientific
 papers must be cited independently of this repository. `CITATION.cff` lists
 the authors of the associated paper (Sylvain Rossi, Pasquale Cirillo,
-Stefano Battiston) and this repository's URL; its publication DOI and
-release-version fields will be filled in once the paper is published.
+Stefano Battiston) and this repository's URL.
+
+This software (v1.0.0) is archived on Zenodo:
+[10.5281/zenodo.22830785](https://doi.org/10.5281/zenodo.22830785) — cite
+that DOI for the code itself. The associated paper's own DOI will be added
+here once it's published.
 
 Licensed under the MIT License — see [`LICENSE`](LICENSE).
