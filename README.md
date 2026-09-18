@@ -186,16 +186,17 @@ tree:
 - the official IDR wheel must be installed separately;
 - full-scale sweep result CSVs/HDF5 caches/figures are generated locally and
   kept out of the repository via `.gitignore` (potentially large);
-- `CITATION.cff` has authors, a repository URL, and a Zenodo DOI for the
+- `CITATION.cff` has author, repository, and Zenodo DOI information for the
   software itself; the associated paper's own DOI is still pending, since
   it's not yet published.
 
 ## Citation and License
 
 The source data, external IDR implementation, and associated scientific
-papers must be cited independently of this repository. `CITATION.cff` lists
-the authors of the associated paper (Sylvain Rossi, Pasquale Cirillo,
-Stefano Battiston) and this repository's URL.
+papers must be cited independently of this repository. `CITATION.cff`
+credits this repository's code to its author, Sylvain Rossi — the
+associated paper has three authors (Sylvain Rossi, Pasquale Cirillo,
+Stefano Battiston); cite the paper itself for that authorship.
 
 This software (v1.0.0) is archived on Zenodo:
 [10.5281/zenodo.22830785](https://doi.org/10.5281/zenodo.22830785) — cite

@@ -15,12 +15,6 @@ authors:
     given-names: "Sylvain"
     email: "sylvain.rossi@zhaw.ch"
     affiliation: "Institute of Business Information Technology, ZHAW School of Management and Law, Theaterstrasse 17, 8401 Winterthur, Switzerland; Department of Finance, University of Zurich, Plattenstrasse 14, 8032 Zürich, Switzerland"
-  - family-names: "Cirillo"
-    given-names: "Pasquale"
-    affiliation: "Institute of Business Information Technology, ZHAW School of Management and Law, Theaterstrasse 17, 8401 Winterthur, Switzerland"
-  - family-names: "Battiston"
-    given-names: "Stefano"
-    affiliation: "Department of Finance, University of Zurich, Plattenstrasse 14, 8032 Zürich, Switzerland; Department of Economics, Ca' Foscari University of Venice, Cannaregio 873, 30121 Venezia, Italy"
 abstract: "Research code for simulating climate hazard-loss dependence, estimating pointwise and upper-tail damage functions, evaluating loss-risk measures, and preparing HANZE flood-event data."
 keywords:
   - climate risk
