@@ -1,0 +1,26 @@
+# Exact versions from the environment that produced this repository's
+# committed results/data-cache outputs (conda env "idr_env", Python 3.13.14
+# -- see docs/reproducibility.md for how to recreate it). Install with:
+#   python -m pip install -r requirements.txt
+
+numpy==2.5.0
+scipy==1.18.0
+pandas==3.0.3
+scikit-learn==1.9.0
+matplotlib==3.11.0
+h5py==3.16.0
+joblib==1.5.3
+ipywidgets==8.1.7
+
+# Jupyter stack, for running the notebook itself.
+jupyter==1.1.1
+jupyterlab==4.5.9
+notebook==7.5.6
+ipykernel==7.2.0
+
+# NOT installed by this file: the official IDR backend. `isodistrreg==0.5.1`
+# is not published on PyPI -- install the matching platform-specific wheel
+# manually. See docs/reproducibility.md / README.md ("Official IDR Backend")
+# for the download link and exact steps. Without it, the notebook still
+# imports cleanly, but any run that includes the "IDR" method fails when it
+# tries to fit.

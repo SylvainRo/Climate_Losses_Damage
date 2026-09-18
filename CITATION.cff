@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, cite the associated publication, this software archive, and the external datasets and IDR implementation."
+title: "Climate_Losses_Damage"
+type: software
+version: "0.1.0"
+repository-code: "https://github.com/SylvainRo/Climate_Losses_Damage"
+license: MIT
+authors:
+  - family-names: "Rossi"
+    given-names: "Sylvain"
+    email: "sylvain.rossi@zhaw.ch"
+    affiliation: "Institute of Business Information Technology, ZHAW School of Management and Law, Theaterstrasse 17, 8401 Winterthur, Switzerland; Department of Finance, University of Zurich, Plattenstrasse 14, 8032 Zürich, Switzerland"
+  - family-names: "Cirillo"
+    given-names: "Pasquale"
+    affiliation: "Institute of Business Information Technology, ZHAW School of Management and Law, Theaterstrasse 17, 8401 Winterthur, Switzerland"
+  - family-names: "Battiston"
+    given-names: "Stefano"
+    affiliation: "Department of Finance, University of Zurich, Plattenstrasse 14, 8032 Zürich, Switzerland; Department of Economics, Ca' Foscari University of Venice, Cannaregio 873, 30121 Venezia, Italy"
+abstract: "Research code for simulating climate hazard-loss dependence, estimating pointwise and upper-tail damage functions, evaluating loss-risk measures, and preparing HANZE flood-event data."
+keywords:
+  - climate risk
+  - damage functions
+  - extreme-value copulas
+  - isotonic distributional regression
+  - expected shortfall
+  - flood losses

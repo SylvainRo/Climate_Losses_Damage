@@ -1,0 +1,43 @@
+# Block your specific virtual environment
+.venv_zhaw/
+.venv_run/
+
+# Block standard Python caches
+**/__pycache__/
+*.pyc
+
+__pycache__/
+*.py[cod]
+*.pyo
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.ipynb_checkpoints/
+
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
+
+.DS_Store
+.vscode/
+
+
+# Generated population caches (Part 8), full-scale sweep outputs, and
+# figures -- large, reproducible from the notebook, not committed. Each
+# folder's own README.md is the only file tracked in it (so the folder
+# itself still shows up, empty, on a fresh clone) -- `dir/*` + `!dir/README.md`
+# rather than a bare `dir/`, since git won't re-include a file whose parent
+# directory is itself excluded.
+data/*
+!data/README.md
+results/*
+!results/README.md
+plots/*
+!plots/README.md
