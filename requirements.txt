@@ -18,9 +18,12 @@ jupyterlab==4.5.9
 notebook==7.5.6
 ipykernel==7.2.0
 
-# NOT installed by this file: the official IDR backend. `isodistrreg==0.5.1`
-# is not published on PyPI -- install the matching platform-specific wheel
-# manually. See docs/reproducibility.md / README.md ("Official IDR Backend")
+# NOT installed by this file: the official IDR backend `isodistrreg`, which
+# is not published on PyPI. The results used a wheel reporting 0.5.1 that is
+# an upstream CI build of commit a95ba86b03bdac83e1dbd1a0de276d41b562b588
+# (not the tagged v0.5.1 release); wheel sha256
+# d571e7c59f87fa76e691a3f90a7bdec79a51e0264907443ce1a727cf0af5a783. Install
+# it manually (build from that commit, or a platform-specific wheel). See docs/reproducibility.md / README.md ("Official IDR Backend")
 # for the download link and exact steps. Without it, the notebook still
 # imports cleanly, but any run that includes the "IDR" method fails when it
 # tries to fit.

@@ -75,10 +75,28 @@ python -m pip install -r requirements.txt
 
 ### Official IDR Backend
 
-The IDR estimator requires the external `isodistrreg` Python bindings
-(`isodistrreg==0.5.1` in the environment that produced this repository's
-results). They are not installed by `requirements.txt`, since they are not
-published on PyPI. The upstream project currently instructs users to
+The IDR estimator requires the external `isodistrreg` Python bindings.
+They are not installed by `requirements.txt`, since they are not
+published on PyPI.
+
+**Exact version used for this repository's results.** The wheel reports
+version `0.5.1`, but it is *not* the tagged `v0.5.1` release (`ab7d844`): it
+is a development build produced by the upstream CI from `master` at commit
+[`a95ba86b03bdac83e1dbd1a0de276d41b562b588`](https://github.com/AlexanderHenzi/isodistrreg/commit/a95ba86b03bdac83e1dbd1a0de276d41b562b588)
+(2026-07-10), 18 commits after `v0.5.1` and before `v0.5.2`, at a point where
+the version number had not yet been bumped. Wheel:
+`isodistrreg-0.5.1-cp313-abi3-manylinux_2_34_x86_64.whl`, sha256
+`d571e7c59f87fa76e691a3f90a7bdec79a51e0264907443ce1a727cf0af5a783`. The
+commit was identified from the build timestamp in the wheel's embedded SBOM,
+which falls within exactly one upstream CI run (on that commit). CI wheels
+expire, so to reproduce this exact version, build it from source at that
+commit (requires a Rust toolchain):
+
+```bash
+python -m pip install "git+https://github.com/AlexanderHenzi/isodistrreg@a95ba86b03bdac83e1dbd1a0de276d41b562b588#subdirectory=bindings/python"
+```
+
+Otherwise, the upstream project currently instructs users to
 download a platform-specific wheel from a recent GitHub Actions run and
 install it locally — note that the current wheel targets CPython 3.13
 specifically (`cp313-abi3`), consistent with this project's Python 3.13

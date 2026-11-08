@@ -22,11 +22,19 @@ python -m pip install -r requirements.txt
 produced this repository's committed results/data-cache outputs. One
 dependency is not in `requirements.txt` and needs a separate step:
 
-- **`isodistrreg`** (the official IDR backend, `0.5.1` in the reproducing
-  environment, needed only when the `"IDR"` method is actually fit): not
-  published on PyPI — install the platform-specific wheel from a recent
-  GitHub Actions run of the upstream project — see the [official
-  installation
+- **`isodistrreg`** (the official IDR backend, needed only when the `"IDR"`
+  method is actually fit): not published on PyPI. The reproducing
+  environment used a wheel reporting version `0.5.1` that is **not** the
+  tagged `v0.5.1` release, but an upstream CI build of `master` at commit
+  `a95ba86b03bdac83e1dbd1a0de276d41b562b588` (2026-07-10, 18 commits after
+  `v0.5.1`, before `v0.5.2`); wheel
+  `isodistrreg-0.5.1-cp313-abi3-manylinux_2_34_x86_64.whl`, sha256
+  `d571e7c59f87fa76e691a3f90a7bdec79a51e0264907443ce1a727cf0af5a783`. To
+  reproduce that exact version, build it from source at the commit (needs a
+  Rust toolchain): `python -m pip install
+  "git+https://github.com/AlexanderHenzi/isodistrreg@a95ba86b03bdac83e1dbd1a0de276d41b562b588#subdirectory=bindings/python"`.
+  Alternatively, install the platform-specific wheel from a recent GitHub
+  Actions run of the upstream project — see the [official installation
   guide](https://github.com/AlexanderHenzi/isodistrreg/blob/master/bindings/python/README.md).
   Without it, the notebook still imports cleanly, but any run that includes
   `"IDR"` in its method list will fail when it tries to fit.
