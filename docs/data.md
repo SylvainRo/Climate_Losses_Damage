@@ -48,8 +48,8 @@ regenerated (unless `RunConfig.rebuild_cache=True`).
 Written by `save_results` (Part 9), called from 10a, 10b, 10b-bis, and 10e
 whenever `load_or_run_bootstrap_study` (Part 9) doesn't already have a
 cache hit for that scenario. If both files for a given `<tag>` (plus
-`cache_tag_suffix`, where a call site passes one -- e.g. 10e's GPD-hazard
-demo uses `"_gpdhazard"`) already exist, `load_or_run_bootstrap_study`
+`cache_tag_suffix`, where a call site passes one -- e.g. 10e's light-scale
+GPD-hazard fallback uses `"_gpdhazard"`) already exist, `load_or_run_bootstrap_study`
 loads them instead of re-fitting every method on every bootstrap subsample
 -- the dominant cost of a full-scale run -- unless `RunConfig.rebuild_cache
 =True`, or the cached files don't cover the current
@@ -87,7 +87,7 @@ list, so retired-method rows are silently ignored -- but the file itself
 stays larger than a from-scratch run would produce until it's regenerated
 (delete it, or set `RunConfig.rebuild_cache=True`, to force that).
 
-## Results: `results/sweep_dagum_<param>_<hazard>[_iter<n>].csv`
+## Results: `results/sweep_dagum_<param>_<hazard>[_iter<n>][_bins<k>][_theta<θ>].csv`
 
 Written incrementally by `load_or_run_sensitivity_sweep` (Part 10c), one
 row appended per `(parameter_value, method, risk_measure)` combination as
@@ -95,7 +95,11 @@ the alpha-sweep computes it -- `<param>` is the swept Dagum parameter
 (`alpha` in the current notebook), `<hazard>` is `weibull` or `gpd`, and
 `_iter<n>` is the bootstrap iteration count folded into the filename
 because the function's own row-level cache key (`parameter_value` alone)
-doesn't otherwise distinguish runs at different iteration counts. The same
+doesn't otherwise distinguish runs at different iteration counts. For the
+same reason `_bins<k>` records the bin count of the binned estimators
+(`SWEEP_BINS`, 10 in the current notebook; files without it were run with
+50 bins), and a Gumbel θ ≠ 2.0 adds `_theta<θ>` (see `GUMBEL_THETA` in
+`docs/reproducibility.md`). The same
 superset-only cache-hit behavior and stale-row caveat above applies here
 too: an already-cached `parameter_value` is never recomputed once present,
 even if it was computed under a now-retired method. Columns:
@@ -141,10 +145,18 @@ aggregating the records above across bootstrap subsamples, per
 `tail_<tag>.csv`, and `results/tables_<tag>/` sections above -- not the
 `results/sweep_dagum_...` files, which use their own `<param>`/`<hazard>`/
 `<n>` naming) is `StudyConfig.cache_tag()`:
-`{copula}_{hazard}_{loss}_N{N}_n{n}_iter{iterations}_bins{bins}`, e.g.
-`lorenz_gpd_dagum_N500000_n500_iter100000_bins10` (the full-scale sweep's
-loss margin is always `dagum`; see the "10b" row of the README's Part 10
-table for the current scenario grid).
+`{copula}_{hazard}_{loss}_N{N}_n{n}_iter{iterations}_bins{bins}[_theta{θ}]`, e.g.
+`lorenz_gpd_dagum_N500000_n500_iter100000_bins10`. The `_theta{θ}` part
+appears only for a Gumbel copula with θ ≠ 2.0 (the `GUMBEL_THETA` setting,
+see `docs/reproducibility.md`), e.g.
+`gumbel_gpd_dagum_N500000_n500_iter100000_bins10_theta1.1`, so θ = 2.0
+filenames are the same as before the setting existed. The full-scale sweep's
+loss margin is `dagum` by default; `lognorm` (lognormal, `s` $=1$,
+`scale` $=1$, i.e. $\mu=0$, $\sigma=1$ for the underlying normal) can be selected with `FULL_SWEEP_LOSS_NAMES` (see
+`docs/reproducibility.md`), e.g.
+`gumbel_weibull_min_lognorm_N500000_n500_iter100000_bins10_theta5`. Loss
+parameters are not part of `<tag>`, so `lognorm` always means that `s`. See
+the "10b" row of the README's Part 10 table for the default scenario grid.
 
 ## Plots: `plots/<name>.png`
 

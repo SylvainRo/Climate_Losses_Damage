@@ -140,7 +140,7 @@ it:
 | --- | --- | ---: |
 | 10a — Light-scale run | Weibull hazard, Dagum losses, `N=100,000`, 100 bootstrap iterations; cached (HDF5 + CSV) like every other run below | seconds once cached, longer on first run |
 | 10b — Full-scale sweep | Every combination of 1 loss margin (Dagum) × 2 hazard margins × 2 copulas (4 scenarios), each at `N=500,000`, 100,000 iterations | very expensive; `RUN_FULL_SCALE = True` by default |
-| 10c — Sensitivity sweep | Dagum tail-index/body-shape sweep | ~minutes |
+| 10c — Sensitivity sweep | Dagum tail-index (`N=500,000`, 20,000 iterations, Weibull and GPD hazards) and body-shape sweeps, 10 equal-count bins as in 10b | ~1.5 h uncached (alpha-sweep), minutes once cached |
 | 10e — Extended diagnostic figures | Upper-tail comparison, hazard-loss risk diagram, IDR conditional law | seconds once cached, longer on first run |
 
 Part 12, at the end, is the HANZE real-data case study — an interactive
