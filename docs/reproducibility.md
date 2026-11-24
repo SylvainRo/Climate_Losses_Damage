@@ -3,7 +3,8 @@
 Everything in this repository runs from one notebook,
 `notebooks/Bootstrap Consolidated.ipynb`. Every distribution, copula,
 estimator, and plotting routine is defined inline in the notebook — nothing
-beyond `requirements.txt` needs installing.
+beyond `requirements.txt` and the IDR backend (below) needs installing. The
+paper's results need v1.1.0 or later of this code (see the README).
 
 ## Environment
 
@@ -19,7 +20,7 @@ python -m pip install -r requirements.txt
 ```
 
 `requirements.txt` pins the exact versions from the environment that
-produced this repository's committed results/data-cache outputs. One
+produced the paper's results and data caches. One
 dependency is not in `requirements.txt` and needs a separate step:
 
 - **`isodistrreg`** (the official IDR backend, needed only when the `"IDR"`
@@ -45,9 +46,10 @@ dependency is not in `requirements.txt` and needs a separate step:
 `h5py` and `joblib` are also optional (wrapped in `try/except ImportError`
 in Part 1): `h5py` is needed for `data_backend="hdf5"` runs, which by
 default is every Part 10 run except 10c's p-sweep (see "Where outputs land"
-below); `joblib` only speeds up the bootstrap loop across subsamples —
-without it, the evaluation engine falls back to a plain sequential loop,
-just slower.
+below); `joblib` is used only when a `RunConfig` sets `n_jobs`, to
+parallelize the loop over subsamples. No run in the notebook sets it, so
+every run is sequential by default; without `joblib`, an `n_jobs` setting
+falls back to the same sequential loop.
 
 ## Running the notebook
 
@@ -152,6 +154,45 @@ GUMBEL_THETA=5 FULL_SWEEP_LOSS_NAMES=lognorm FULL_SWEEP_HAZARD_NAMES=weibull \
 earlier `s` $=\sqrt{0.1}$ version were moved to `results/_archive_lognorm_sigma2_0.1/` and
 `data/_archive_lognorm_sigma2_0.1/` so they are not picked up as cache hits.
 
+## Reproducing the paper's runs
+
+"Bootstrap" in the notebook's names means the paper's Monte Carlo
+subsampling: `iterations` ($S$) subsamples of size `n`, drawn without
+replacement from a population of size `N`. The paper's simulation results come
+from the invocations below. Run each from `notebooks/` with the headless
+command above (`jupyter nbconvert --to notebook --execute
+--ExecutePreprocessor.timeout=-1 --output-dir /tmp --output <name>.ipynb
+"Bootstrap Consolidated.ipynb"`), adding `SWEEP_MAX_NEW_SCENARIOS=1
+SAVE_FIGURES=1`, and repeat it until 10b reports no newly computed scenario.
+[`paper_mapping.md`](paper_mapping.md) lists the output file behind each table
+and figure.
+
+| Run | Environment variables | Paper items |
+| --- | --- | --- |
+| Default grid (Gumbel θ = 2 and Lorenz; Weibull and GPD hazards) | none | SI Tables S3, S4, S9–S12, S17–S28; SI Fig. S1 (10e) and Fig. S2 (10c) |
+| Gumbel θ = 1.1, Dagum | `GUMBEL_THETA=1.1 RUN_ALPHA_SWEEP=0 FULL_SWEEP_HAZARD_NAMES=weibull FULL_SWEEP_COPULA_NAMES=gumbel` | Tables 1 and 2 (θ = 1.1), SI Tables S5–S8; Figs. 1 and 2 (10e) |
+| Gumbel θ = 5, Dagum | `GUMBEL_THETA=5 RUN_ALPHA_SWEEP=0 FULL_SWEEP_HAZARD_NAMES=weibull FULL_SWEEP_COPULA_NAMES=gumbel` | Tables 1 and 2 (θ = 5), SI Tables S13–S16 |
+| Gumbel θ = 1.1, 2, 5, lognormal | `GUMBEL_THETA=<θ> RUN_ALPHA_SWEEP=0 FULL_SWEEP_LOSS_NAMES=lognorm FULL_SWEEP_HAZARD_NAMES=weibull FULL_SWEEP_COPULA_NAMES=gumbel` | SI Table S2 (θ = 1.1, 2, 5); SI Tables S29–S32 (θ = 1.1) and S33–S36 (θ = 5) |
+| HANZE, Spain | interactive | SI Table S37: Part 12 dashboard with Country = Spain, every other control at its default (see the Part 12d markdown cell) |
+
+Things to know about these invocations:
+
+- Every invocation also runs 10a, the 10c p-sweep and 10e. 10e loops over
+  θ = 1.1, 2 and 5 independently of `GUMBEL_THETA` and, with `RUN_FULL_SCALE`
+  on, loads the full-scale Weibull/Dagum scenario at each of them — or
+  computes it if it is missing. 10e is not capped by
+  `SWEEP_MAX_NEW_SCENARIOS`: on a fresh machine, the first invocation that
+  reaches 10e computes every missing one of those three scenarios (saving
+  each, and freeing it before loading the next), so expect it to take up to
+  three full-scale runs longer. Later invocations load them from cache.
+- With GPD hazards, 10e uses full-scale results only when they are already
+  on disk; otherwise it falls back to the light design (`_gpdhazard` suffix).
+- Part 12 needs `data/HANZE_events.csv`. Without it, a headless run stops at
+  Part 12, after every simulation result has been saved.
+- Table 1's rows θ = 1.05 and θ = 1.5, its asymptotic column, SI Table S1 and
+  the other analytical values of SI §2 are not computed by the notebook (see
+  [`paper_mapping.md`](paper_mapping.md)).
+
 ## Where outputs land
 
 All three are sibling folders to `notebooks/`, located automatically
@@ -162,7 +203,7 @@ started from the repository root or from inside `notebooks/`.
 | Folder | What goes there | Written by |
 | --- | --- | --- |
 | `data/` | `HANZE_events.csv` (you provide this, see `docs/data.md`); generated `<tag>.h5` population/subsample caches | Part 8's `generate_population_and_subsamples`, whenever `data_backend="hdf5"` — every Part 10 run (10a, 10b, 10c's alpha-sweep, 10e) except 10c's p-sweep, which stays in-memory |
-| `results/` | `pointwise_<tag>.csv`, `tail_<tag>.csv`, `tables_<tag>/*.csv`; also `sweep_dagum_<param>_<hazard>[_iter<n>][_bins<k>][_theta<θ>].csv` from 10c's alpha-sweep (see `docs/data.md`) | `save_results`, called from 10a, 10b, 10b-bis, and 10e whenever their `load_or_run_bootstrap_study` call misses its cache; the sweep CSVs by `load_or_run_sensitivity_sweep` (10c), one grid point at a time |
+| `results/` | `pointwise_<tag>.csv`, `tail_<tag>.csv`, `tables_<tag>/*.csv`; also `sweep_dagum_<param>_<hazard>[_iter<n>][_bins<k>][_theta<θ>].csv` from 10c's alpha-sweep (see `docs/data.md`) | `save_results`, called from 10a, 10b, and 10e whenever their `load_or_run_bootstrap_study` call misses its cache; the sweep CSVs by `load_or_run_sensitivity_sweep` (10c), one grid point at a time |
 | `plots/` | `<name>.png` per figure | `save_figure`, called from every plotting function, only when `SAVE_FIGURES=True` |
 
 `<tag>` is `StudyConfig.cache_tag()` — copula, hazard, loss margin names and
@@ -180,9 +221,12 @@ disambiguated (10e's light-scale GPD-hazard fallback, used when no full-scale GP
 ## Interpreting results
 
 See the README's "Interpreting the Evaluation" section for the pointwise/
-tail/VaR/ES conventions, and the notebook's own Part 6/8 markdown cells for
-the full mathematical detail (theoretical targets, the coherent
-superquantile ES convention, IDR's mixture-distribution VaR/ES). This guide
+tail/VaR/ES conventions, and the notebook's own markdown cells for the full
+mathematical detail: theoretical targets in Part 6, the coherent
+superquantile ES convention in Parts 4 and 7d, IDR's mixture-distribution
+VaR/ES in Part 7d, and the evaluation and reporting conventions in Parts 8
+and 9. [`paper_mapping.md`](paper_mapping.md) relates the output columns to the
+paper's tables. This guide
 only covers setup and where things end up on disk — the methodology is
 documented inline, next to the code that implements it, to avoid two copies
 of the same explanation drifting out of sync.

@@ -27,6 +27,24 @@ internally by `HANZE_RENAME_MAP` in the notebook's Part 12a):
 Each event remains one observation; `losses_euro_total` is that event's
 aggregate loss, not split or allocated across the regions it lists.
 
+## Generated parse cache: `data/HANZE_events_parsed.csv`
+
+Written by `load_or_parse_hanze_causes` (Part 12b) the first time the notebook
+parses the free-text `Cause` field, and reused on every later run as long as it
+covers every current `event_id` (otherwise it is rebuilt). One row per event:
+
+| Column | Meaning |
+| --- | --- |
+| `event_id`, `start_date`, `end_date`, `year`, `region2021`, `cause_raw`, `losses_euro_total` | copied from `HANZE_events.csv` (renamed as above) |
+| `hazard_main_type` | first matching label: `torrential_rain`, `heavy_rainfall`, `extreme_rainfall`, `snowmelt`, `river_overflow`, `storm_surge`, else `unknown` |
+| `rain_amount_mm` | first rainfall amount matched in the text (the hazard variable used in the paper) |
+| `duration_h`, `duration_days` | duration matched with that amount, if any |
+| `intensity_mm_per_h`, `equiv_mm_per_24h` | amount / duration, only when both are matched (not used in the paper: durations are reported too inconsistently) |
+| `hazard_parse_confidence` | `high` (amount and duration), `medium` (amount only), `low` (no amount) |
+
+When a description contains several amount-duration pairs, only the first is
+kept.
+
 ## Generated population caches: `data/<tag>.h5`
 
 Written by `generate_population_and_subsamples` (Part 8) whenever a
@@ -45,7 +63,7 @@ regenerated (unless `RunConfig.rebuild_cache=True`).
 
 ## Results: `results/pointwise_<tag>.csv`, `results/tail_<tag>.csv`
 
-Written by `save_results` (Part 9), called from 10a, 10b, 10b-bis, and 10e
+Written by `save_results` (Part 9), called from 10a, 10b, and 10e
 whenever `load_or_run_bootstrap_study` (Part 9) doesn't already have a
 cache hit for that scenario. If both files for a given `<tag>` (plus
 `cache_tag_suffix`, where a call site passes one -- e.g. 10e's light-scale
@@ -62,13 +80,14 @@ columns (`target` distinguishes them: `"pointwise"` or `"tail"`):
 | Column | Meaning |
 | --- | --- |
 | `method` | estimator name (`"Quadratic"`, `"Sigmoid"`, `"Isotonic"`, `"Isotonic (raw)"`, or `"IDR"` as of the current method roster; see the caveat below) |
-| `subsample_id` | which bootstrap subsample (0-indexed) |
+| `subsample_id` | which subsample (0-indexed; "bootstrap" subsample in the code's naming, drawn without replacement) |
 | `var_level` | the VaR level $q$ this row is evaluated at |
-| `h_var_sub` | this subsample's own empirical hazard VaR at $q$ |
+| `h_var_sub` | this subsample's own empirical hazard VaR at $q$ (lower empirical quantile) |
 | `loss_var_sub` / `loss_es_sub` | this subsample's empirical loss VaR/ES at $q$ (the "Empirical subsample" baseline) |
-| `damage_var_sub` / `damage_es_sub` | this method's estimated marginal loss VaR/ES at $q$ |
-| `damage_variance_sub` | variance of this method's damage-sample estimate |
-| `damage_stat_source` | which code path produced the marginal estimate (`"predicted_damage_sample"`, `"conditional_distribution"`, `"tail_distribution"`, `"mixture_var_es"`, ...) |
+| `tail_mean_sub` | this subsample's empirical hazard-tail mean, the mean observed loss over $H_i \ge$ `h_var_sub` (the "Empirical subsample" baseline of the tail table) |
+| `damage_var_sub` / `damage_es_sub` | this method's estimated marginal loss VaR/ES at $q$ (identical in the pointwise and tail files) |
+| `damage_variance_sub` | variance of this method's model-implied marginal loss: of the fitted values $\hat d(H_i)$ for a mean curve, of the fitted mixture distribution for IDR |
+| `damage_stat_source` | which code path produced the marginal estimate: `"predicted_damage_sample"` (the four mean curves: VaR/ES of the fitted values $\hat d(H_i)$) or `"marginal_distribution"` (IDR: VaR/ES of the mixture of fitted conditional CDFs). `"mixture_var_es"` is reserved for an aggregate-model extension hook that no current method uses |
 | `h_theory_true` | the theoretical hazard VaR at $q$ (not the empirical `h_var_sub`) |
 | `prediction` | this method's pointwise (`E[L\|H=h_q]`) or tail (`E[L\|H>=h_q]`) estimate, depending on `target` |
 | `true_full` | the theoretical target `prediction` is compared against |
@@ -134,12 +153,16 @@ aggregating the records above across bootstrap subsamples, per
 | `Estimator` | method name (or `"Empirical subsample"`) |
 | `VaR level` | $q$ |
 | `Theory` | theoretical target value |
-| `Bootstrap mean` / `Bootstrap median` | across bootstrap subsamples |
-| `Std` | bootstrap standard deviation |
+| `Bootstrap mean` / `Bootstrap median` | across subsamples (the paper's "Mean"/"Median") |
+| `Std` | standard deviation across subsamples, divisor $S-1$ |
 | `Bias` | `Bootstrap mean - Theory` |
-| `% error` / `Median % error` | bias as a percentage of `Theory` (mean- and median-based) |
-| `RMSE` / `MAE` | against `Theory`, across subsamples |
-| `NaN count` | how many subsamples this method failed to produce a finite estimate for |
+| `% error` / `Median % error` | `100 * (Bootstrap mean - Theory) / Theory` and `100 * (Bootstrap median - Theory) / Theory` (the paper's "Mean % Err." / "Median % Err.") |
+| `RMSE` / `MAE` | against `Theory`, across subsamples, in loss units (the paper's Table 2 reports `MAE / Theory × 100`) |
+| `NaN count` | how many subsamples this method failed to produce a finite estimate for; for Quadratic/Sigmoid, the fits rejected by the significance screen ($S$ minus the paper's "accepted fits") |
+| `NaN (screen-rejected)` / `NaN (fit error)` / `NaN (other)` | `NaN count` split by cause. The split is available only when the table was built from a fresh run with `collect_diagnostics=True`; a table rebuilt from cached results CSVs counts every NaN under `NaN (other)` |
+
+All statistics except `NaN count` are computed over the finite estimates only,
+so Quadratic/Sigmoid rows describe the accepted fits.
 
 `<tag>` (used by the `data/<tag>.h5`, `results/pointwise_<tag>.csv`/
 `tail_<tag>.csv`, and `results/tables_<tag>/` sections above -- not the
@@ -165,4 +188,5 @@ figure, named after what it shows — most embed the producing scenario's
 `cache_tag()` (e.g. `joint_sample_<tag>.png`) so different scenarios never
 overwrite each other; a few figures tied to a single interactive tool
 (the HANZE dashboard) use a fixed name instead, since only the latest render
-is meaningful there (e.g. `hanze_hazard_loss_fits.png`).
+is meaningful there (e.g. `hanze_hazard_loss_fits.png`). The files behind the
+paper's figures are listed in [`paper_mapping.md`](paper_mapping.md).

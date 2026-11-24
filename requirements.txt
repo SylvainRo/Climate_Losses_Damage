@@ -1,5 +1,5 @@
-# Exact versions from the environment that produced this repository's
-# committed results/data-cache outputs (conda env "idr_env", Python 3.13.14
+# Exact versions from the environment that produced the paper's
+# results and data caches (conda env "idr_env", Python 3.13.14
 # -- see docs/reproducibility.md for how to recreate it). Install with:
 #   python -m pip install -r requirements.txt
 
